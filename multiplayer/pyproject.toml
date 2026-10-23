@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jarviscore-multiplayer"
+version = "0.1.0"
+description = "A team and its agents writing a product launch together, in one room."
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["jarviscore-framework[redis]>=2.3.1,<2.4"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "fakeredis>=2.20", "ruff>=0.15"]
+
+[tool.setuptools]
+packages = ["multiplayer"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+extend-exclude = [".jarviscore", "blob_storage", ".venv"]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "BLE"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["multiplayer"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]

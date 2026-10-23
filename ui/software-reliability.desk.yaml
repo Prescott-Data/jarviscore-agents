@@ -1,0 +1,48 @@
+name: JarvisCore for Software Reliability
+factory: software_reliability.team:build_mesh
+mesh_handler: software_reliability.team:submit_task
+mesh_reconcile_handler: software_reliability.team:reconcile_task
+blueprint: software-reliability
+mesh_id: software-reliability-mesh
+required_framework_version: ">=2.3.1,<3"
+agents:
+  repository_cartographer:
+    id: software-reliability-cartographer
+    name: Repository Cartographer
+    color: "#397b72"
+    shape: circle
+  defect_miner:
+    id: software-reliability-defect-miner
+    name: Defect Miner
+    color: "#bd6847"
+    shape: diamond
+  reproduction_engineer:
+    id: software-reliability-reproducer
+    name: Reproduction Engineer
+    color: "#4975bd"
+    shape: rounded
+  impact_analyst:
+    id: software-reliability-impact-analyst
+    name: Impact Analyst
+    color: "#b58b32"
+    shape: hexagon
+  repair_engineer:
+    id: software-reliability-repair-engineer
+    name: Repair Engineer
+    color: "#ab5876"
+    shape: rounded
+  verification_engineer:
+    id: software-reliability-verification-engineer
+    name: Verification Engineer
+    color: "#438a9e"
+    shape: diamond
+  rule_engineer:
+    id: software-reliability-rule-engineer
+    name: Rule Engineer
+    color: "#6f675d"
+    shape: hexagon
+  reliability_strategist:
+    id: software-reliability-strategist
+    name: Reliability Strategist
+    color: "#2f6d4f"
+    shape: circle

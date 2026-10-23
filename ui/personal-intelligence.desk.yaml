@@ -1,0 +1,14 @@
+name: JarvisCore Agents
+factory: personal_intelligence.team:build_mesh
+mesh_handler: personal_intelligence.team:submit_task
+mesh_reconcile_handler: personal_intelligence.team:reconcile_task
+blueprint: personal-intelligence
+mesh_id: personal-intelligence-mesh
+mesh_name: Personal Intelligence
+required_framework_version: ">=2.3.1,<3"
+agents:
+  personal_intelligence_agent:
+    id: personal-intelligence-agent
+    name: Personal Intelligence
+    color: "#6f675d"
+    shape: circle

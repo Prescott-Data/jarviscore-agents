@@ -1,0 +1,5 @@
+pydantic>=2
+pyyaml
+pytest
+pytest-asyncio
+ruff>=0.15

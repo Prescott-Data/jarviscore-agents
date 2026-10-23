@@ -1,0 +1,16 @@
+name: My Agent Workspace
+factory: my_agents:build_mesh
+blueprint: my-project
+mesh_handler: my_agents:submit_task
+working_dir: ./runtime
+trace_dir: ./runtime/traces
+metrics_url: http://127.0.0.1:9090/metrics
+agents:
+  researcher:
+    name: Researcher
+    color: "#397b72"
+    shape: circle
+  writer:
+    name: Writer
+    color: "#cb714f"
+    shape: diamond

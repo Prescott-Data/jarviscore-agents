@@ -1,0 +1,15 @@
+# Public ATS example. No provider credential is required.
+# From the gtm project root:
+#   gtm run --watchlist gtm/demo/watchlists/watchlist-ats.yaml
+
+accounts:
+  - id: monzo
+    name: Monzo
+    domain: monzo.com
+    why: >-
+      They run a large in-house operations team and we replace manual
+      back-office workflow. A requisition for someone who owns that workflow
+      is the signal we care about; engineering and marketing hiring is not.
+    sources:
+      - type: greenhouse
+        token: monzo

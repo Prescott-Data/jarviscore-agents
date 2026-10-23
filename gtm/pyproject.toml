@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jarviscore-gtm"
+version = "0.1.0"
+description = "JarvisCore for GTM — a go-to-market desk of agents built on jarviscore-framework."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+dependencies = [
+    # redis backs Mesh.execute_goal: durable goals, approvals and resume.
+    "jarviscore-framework[redis]>=2.3.1,<2.4",
+    "pydantic>=2",
+    "pyyaml",
+    # The ATS source uses the OS trust store; Python's bundled CAs fail behind proxies.
+    "truststore",
+    "aiohttp",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "ruff>=0.15",
+]
+
+[project.scripts]
+gtm = "gtm.cli:main"
+gtm-demo = "gtm.demo:main"
+
+[tool.setuptools.packages.find]
+include = ["gtm*"]
+
+[tool.setuptools.package-data]
+"gtm.demo" = ["README.md", "watchlists/*.yaml", "fixtures/globex/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+extend-exclude = [".jarviscore", "blob_storage", ".venv"]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "BLE"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]

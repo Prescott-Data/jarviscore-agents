@@ -1,0 +1,20 @@
+{
+  "source": "serper",
+  "records": [
+    {
+      "subject_key": "https://globex.example/careers/4471",
+      "salient": {"title": "VP of Operations", "location": "Leeds"},
+      "payload": {"applicants": 12, "posted": "2026-08-29"}
+    },
+    {
+      "subject_key": "https://globex.example/pricing",
+      "salient": {"plans": ["Starter", "Growth", "Enterprise"], "starting_at": "£49/mo"},
+      "payload": {"fetched_rank": 1}
+    },
+    {
+      "subject_key": "https://globex.example/blog/audit-logs",
+      "salient": {"title": "Audit logs are now generally available"},
+      "payload": {"reading_time": "3 min"}
+    }
+  ]
+}

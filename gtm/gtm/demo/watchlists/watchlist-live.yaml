@@ -1,0 +1,21 @@
+# Live web-search example. Requires a configured search provider.
+# From the gtm project root:
+#   gtm run --watchlist gtm/demo/watchlists/watchlist-live.yaml
+
+accounts:
+  - id: monzo
+    name: Monzo
+    domain: monzo.com
+    why: >-
+      They run a large in-house operations team and we replace manual
+      back-office workflow. We care about how that team is staffed and what
+      it is being asked to absorb.
+    sources:
+      - type: web
+        name: web_hiring
+        query: "{name} operations jobs careers hiring"
+        max_results: 6
+      - type: web
+        name: web_news
+        query: "{name} announcement launch {domain}"
+        max_results: 6

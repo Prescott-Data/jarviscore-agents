@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Every blueprint installs JarvisCore from PyPI, exactly as a developer does.
+jobs:
+  blueprint:
+    name: ${{ matrix.blueprint }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        blueprint: [gtm, personal-intelligence, software-reliability, multiplayer]
+    defaults:
+      run:
+        working-directory: ${{ matrix.blueprint }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: ${{ matrix.blueprint }}/pyproject.toml
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Lint
+        run: ruff check . --output-format github
+      - name: Tests (offline, no model keys)
+        run: python -m pytest -q
+
+  desk:
+    name: Desk
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: ui/frontend/package-lock.json
+      - name: Install the Desk and every blueprint
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -r requirements.txt \
+            -e ../gtm -e ../personal-intelligence -e ../software-reliability -e "../multiplayer[dev]"
+      - name: Lint server
+        run: |
+          .venv/bin/python -m pip install "ruff>=0.15"
+          .venv/bin/python -m ruff check server tests --output-format github
+      - name: Lint, typecheck and build frontend
+        run: |
+          npm --prefix frontend ci
+          npm --prefix frontend run lint
+          npm --prefix frontend run build
+      - name: Server tests
+        run: .venv/bin/python -m pytest tests -q
+      - name: Browser tests
+        working-directory: ui/frontend
+        run: |
+          npx playwright install --with-deps chromium --only-shell
+          npm test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: desk-browser-traces
+          path: ui/frontend/test-results/

@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jarviscore-software-reliability"
+version = "0.2.0"
+description = "Open-source software reliability agents built on jarviscore-framework."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+dependencies = [
+    "jarviscore-framework[redis]>=2.3.1,<2.4",
+    "pydantic>=2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pyyaml",
+    "pytest-asyncio",
+    "ruff>=0.15",
+]
+
+[project.scripts]
+software-reliability = "software_reliability.cli:main"
+software-reliability-demo = "software_reliability.demo:main"
+software-reliability-benchmark = "software_reliability.demo:benchmark_main"
+
+[tool.setuptools.packages.find]
+include = ["software_reliability*"]
+
+[tool.setuptools.package-data]
+"software_reliability.demo" = [
+    "README.md",
+    "fixtures/authorization_bypass/*.py",
+    "fixtures/authorization_bypass/*.patch",
+    "fixtures/authorization_bypass/tests/*.py",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+extend-exclude = [".jarviscore", "blob_storage", ".venv"]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "BLE"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]

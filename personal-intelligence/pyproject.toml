@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jarviscore-personal-intelligence"
+version = "0.2.0"
+description = "JarvisCore for Personal Intelligence: private crews for consequential goals and decisions."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+dependencies = [
+    "jarviscore-framework[redis,browser]>=2.3.1,<2.4",
+    "aiohttp",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio", "ruff>=0.15"]
+
+[project.scripts]
+personal-intelligence-telegram = "personal_intelligence.channels.telegram:main"
+
+[tool.setuptools.packages.find]
+include = ["personal_intelligence*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+extend-exclude = [".jarviscore", "blob_storage", ".venv"]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "BLE"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]

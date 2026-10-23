@@ -1,0 +1,12 @@
+# Fictional fixture example. It never selects a live provider.
+
+accounts:
+  - id: globex
+    name: Globex
+    domain: globex.example
+    why: >-
+      Renewal is due in Q1 and their ops team owns the workflow we replace.
+      We need to know if that team's priorities move before the renewal lands.
+    sources:
+      - type: fixture
+        path: ../fixtures/globex/monday.json

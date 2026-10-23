@@ -1,0 +1,23 @@
+name: Campaign Desk
+factory: multiplayer.team:build_mesh
+room_factory: multiplayer.team:open_room
+blueprint: multiplayer
+mesh_id: campaign-room
+mesh_name: Campaign room
+required_framework_version: ">=2.3.1,<3"
+agents:
+  room:
+    id: campaign-desk
+    name: Campaign Desk
+    color: "#4975bd"
+    shape: circle
+  writer:
+    id: writer
+    name: Writer
+    color: "#397b72"
+    shape: rounded
+  strategist:
+    id: strategist
+    name: Strategist
+    color: "#7a5bc4"
+    shape: rounded

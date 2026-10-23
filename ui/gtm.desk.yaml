@@ -1,0 +1,14 @@
+name: JarvisCore Agents
+factory: gtm.team:build_mesh
+mesh_handler: gtm.team:submit_task
+mesh_reconcile_handler: gtm.team:reconcile_task
+blueprint: gtm
+mesh_id: gtm-mesh
+mesh_name: GTM Agent
+required_framework_version: ">=2.3.1,<3"
+agents:
+  gtm_agent:
+    id: gtm-agent
+    name: GTM Agent
+    color: "#397b72"
+    shape: circle

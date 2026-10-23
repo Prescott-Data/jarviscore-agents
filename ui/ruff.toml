@@ -1,0 +1,10 @@
+# The desk server is the only Python in this repository without a package
+# manifest, so lint configuration lives here rather than in a pyproject.
+line-length = 120
+target-version = "py312"
+
+[lint]
+select = ["E", "F", "W", "I", "B", "BLE"]
+
+[lint.per-file-ignores]
+"**/__init__.py" = ["F401"]

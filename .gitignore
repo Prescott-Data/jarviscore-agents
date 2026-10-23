@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+*.egg-info/
+build/
+dist/
+gtm/.gtm-state/
+gtm/logs/
+/blob_storage/
+/logs/
+/traces/
+/output/
+# JarvisCore runtime state (logs, traces, sandbox scratch) and local storage
+.jarviscore/
+blob_storage/
+.pytest_cache/
+.env
+.env.*
+!.env.example

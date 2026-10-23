@@ -1,0 +1,14 @@
+diff --git a/service.py b/service.py
+--- a/service.py
++++ b/service.py
+@@ -21,7 +21,9 @@ class ServeConfig:
+
+
+ def has_path_handler(config: ServeConfig) -> bool:
+-    return any(handler.path for handler in config.web_handlers)
++    if any(handler.path for handler in config.web_handlers):
++        return True
++    return any(handler.path for service in config.services for handler in service.handlers)
+
+
+ def authorize(config: ServeConfig, *, is_admin: bool) -> bool:

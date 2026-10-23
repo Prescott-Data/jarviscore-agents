@@ -1,0 +1,25 @@
+{
+  "source": "serper",
+  "records": [
+    {
+      "subject_key": "https://globex.example/careers/4471",
+      "salient": {"title": "VP of Operations", "location": "Leeds"},
+      "payload": {"applicants": 88, "posted": "2026-08-29"}
+    },
+    {
+      "subject_key": "https://globex.example/pricing",
+      "salient": {"plans": ["Starter", "Growth", "Enterprise"], "starting_at": "£79/mo"},
+      "payload": {"fetched_rank": 3}
+    },
+    {
+      "subject_key": "https://globex.example/blog/audit-logs",
+      "salient": {"title": "Audit logs are now generally available"},
+      "payload": {"reading_time": "4 min"}
+    },
+    {
+      "subject_key": "https://globex.example/careers/4488",
+      "salient": {"title": "Head of Data Platform", "location": "Remote (UK)"},
+      "payload": {"applicants": 0, "posted": "2026-09-07"}
+    }
+  ]
+}
