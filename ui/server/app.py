@@ -50,7 +50,8 @@ BlinkMacSystemFont,sans-serif;color:#1d2433;background:#f6f8fb}div{text-align:ce
 b{display:block;font-size:20px;margin:10px 0 4px}small{color:#64748b}
 i{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;font-style:normal;
 font-size:22px;color:#fff;background:#2f7f74}.failed i{background:#b42318}</style></head>
-<body class="__STATE__"><div><i>__ICON__</i><b>__MESSAGE__</b><small>You can close this window; the work goes on.</small></div>
+<body class="__STATE__"><div><i>__ICON__</i><b>__MESSAGE__</b>
+<small>You can close this window; the work goes on.</small></div>
 <script>setTimeout(function(){window.close()},1600)</script></body></html>"""
 
 _NOT_BUILT = """<!doctype html><meta charset="utf-8"><title>Desk not built</title>

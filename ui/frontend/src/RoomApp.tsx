@@ -177,16 +177,18 @@ export function RoomApp({ workspaceName }: { workspaceName: string }) {
   const person = (id: string) => people.find(p => p.id === id);
   const self = person(me);
 
+  const posts = view?.posts;
+  const viewer = view?.me;
   const threads = useMemo(() => {
     const roots = new Map<string, Post[]>();
     // Until the newly signed-in person's view arrives, never show what was private to the last one.
-    const mine = view?.me === me ? view.posts : (view?.posts ?? []).filter(post => !post.to || post.to === me);
+    const mine = viewer === me ? (posts ?? []) : (posts ?? []).filter(post => !post.to || post.to === me);
     for (const post of mine) roots.set(post.thread, [...(roots.get(post.thread) ?? []), post]);
     return [...roots.entries()]
       .map(([id, posts]) => ({ id, posts, first: posts[0], last: posts[posts.length - 1] }))
       .filter(item => item.first.kind === 'message')
       .sort((a, b) => b.last.at - a.last.at);
-  }, [view?.posts, view?.me, me]);
+  }, [posts, viewer, me]);
   const current = threads.find(item => item.id === thread);
 
   useEffect(() => {

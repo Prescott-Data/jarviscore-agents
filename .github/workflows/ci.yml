@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        blueprint: [gtm, personal-intelligence, software-reliability, multiplayer]
+        blueprint: [gtm, personal-intelligence, software-reliability, multiplayer, claims]
     defaults:
       run:
         working-directory: ${{ matrix.blueprint }}
@@ -34,6 +34,13 @@ jobs:
         run: ruff check . --output-format github
       - name: Tests (offline, no model keys)
         run: python -m pytest -q
+      - name: The filmed runs still verify and replay
+        if: matrix.blueprint == 'claims'
+        run: |
+          for record in evidence/*/; do
+            jarviscore verify --export "$record"
+            jarviscore replay "$record"
+          done
 
   desk:
     name: Desk
@@ -55,7 +62,8 @@ jobs:
         run: |
           python -m venv .venv
           .venv/bin/python -m pip install -r requirements.txt \
-            -e ../gtm -e ../personal-intelligence -e ../software-reliability -e "../multiplayer[dev]"
+            -e ../gtm -e ../personal-intelligence -e ../software-reliability -e "../multiplayer[dev]" \
+            -e "../claims[hub]"
       - name: Lint server
         run: |
           .venv/bin/python -m pip install "ruff>=0.15"
