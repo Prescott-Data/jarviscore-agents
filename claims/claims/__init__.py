@@ -1,0 +1,1 @@
+"""The claims desk blueprint."""

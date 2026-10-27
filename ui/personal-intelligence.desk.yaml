@@ -5,7 +5,7 @@ mesh_reconcile_handler: personal_intelligence.team:reconcile_task
 blueprint: personal-intelligence
 mesh_id: personal-intelligence-mesh
 mesh_name: Personal Intelligence
-required_framework_version: ">=2.3.1,<3"
+required_framework_version: ">=3.0.1,<4"
 agents:
   personal_intelligence_agent:
     id: personal-intelligence-agent

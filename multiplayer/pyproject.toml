@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "A team and its agents writing a product launch together, in one room."
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["jarviscore-framework[redis]>=2.3.1,<2.4"]
+dependencies = ["jarviscore-framework[redis]>=3.0.1,<4"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pytest-asyncio>=0.24", "fakeredis>=2.20", "ruff>=0.15"]

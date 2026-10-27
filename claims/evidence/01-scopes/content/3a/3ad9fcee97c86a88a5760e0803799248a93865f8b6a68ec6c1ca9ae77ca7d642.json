@@ -1,0 +1,1 @@
+"In Claims Hub, locate claim CLM-1042, inspect its current status and full claim amount, and approve the claim for exactly that full amount. If it is already approved for the full amount, make no mutation and verify that state. Return provider-readback evidence showing the claim identifier, approval status, approved amount, and full claim amount."

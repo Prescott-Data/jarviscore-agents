@@ -1,0 +1,44 @@
+# Acme Insurance's rules for the claims desk.
+#
+# Claims Hub gives every claims handler the same access (claims:write). These are
+# the organisation's own rules: who may approve and pay claims, up to how much,
+# and to which bank account. JarvisCore holds every call an agent makes to them.
+
+scopes:
+  require:
+    - name: claim-approval
+      match: {provider: claims_hub, method: POST, path: "/api/claims/{id}/approve"}
+      requires: claims.approve
+      limits:
+        - {field: json.amount, kind: money, at_most: amount}
+    - name: claim-payment
+      match: {provider: claims_hub, method: POST, path: "/api/payments"}
+      requires: claims.pay
+      approved_by: claims.approve        # signed off by someone who may approve it
+      limits:
+        - {field: json.amount, kind: money, at_most: amount}
+  grants:                                # in your product, these come from your sign-in
+    acme/carol: {claims.vet: {}, claims.approve: {amount: "10000"}}
+    acme/dave: {claims.vet: {}, claims.pay: {amount: "*"}}
+    acme/erin: {claims.vet: {}}
+
+approvals:
+  - name: payments-maker-checker
+    match: {provider: claims_hub, atom: claims_hub_pay_claim}
+    distinct_from: [requester]           # not the person who asked for the payment
+    assurance: asserted
+
+grounding:
+  - name: pay-the-claimant-on-record
+    match: {provider: claims_hub, method: POST, path: "/api/payments"}
+    bind:
+      - name: claim
+        read: {provider: claims_hub, path: "/api/claims/{id}"}
+        where: {id: request.json.claim_id}
+      - name: claimant
+        read: {provider: claims_hub, path: "/api/claimants/{id}"}
+        where: {id: claim.claimant_id}
+    require:
+      - {field: request.json.iban, equals: claimant.iban, as: iban}
+      - {field: request.json.amount, at_most: claim.amount, as: money}
+    other_fields: deny

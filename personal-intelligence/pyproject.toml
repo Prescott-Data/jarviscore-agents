@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
-    "jarviscore-framework[redis,browser]>=2.3.1,<2.4",
+    "jarviscore-framework[redis,browser]>=3.0.1,<4",
     "aiohttp",
 ]
 

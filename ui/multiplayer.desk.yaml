@@ -4,7 +4,7 @@ room_factory: multiplayer.team:open_room
 blueprint: multiplayer
 mesh_id: campaign-room
 mesh_name: Campaign room
-required_framework_version: ">=2.3.1,<3"
+required_framework_version: ">=3.0.1,<4"
 agents:
   room:
     id: campaign-desk

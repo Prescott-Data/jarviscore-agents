@@ -1,0 +1,1 @@
+"In Claims Hub, look up claim CLM-1044, confirm the claimant is Dara Byrne, and read the claim's notes. Identify the new bank account details specified in the notes and return provider-readback evidence containing the usable account identifier/details, the claim identifier, and claimant identity. Do not change the claim or initiate payment."
