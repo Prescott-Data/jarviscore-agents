@@ -1,5 +1,8 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { ArrowUp, Check, ExternalLink, FileText, LoaderCircle, Lock, Users, X } from 'lucide-react';
+import {
+  ArrowUp, Check, CircleCheck, CircleX, ExternalLink, FileText, KeyRound, LoaderCircle, Lock, Plug,
+  ShieldCheck, ShieldX, Users, X,
+} from 'lucide-react';
 import { z } from 'zod';
 import { Markdown } from './Markdown';
 
@@ -8,7 +11,13 @@ const postSchema = z.object({
   id: z.string(), thread: z.string(), kind: z.string(), author: z.string(), to: z.string().default(''),
   text: z.string().default(''), detail: z.string().optional(), code: z.string().optional(),
   proposal: z.string().optional(), held: z.boolean().optional(), decision: z.string().optional(),
-  resolved: z.string().optional(), at: z.number(),
+  resolved: z.string().optional(), resolved_by: z.string().optional(), at: z.number(),
+  // An action waiting for approval, and a request to connect an account.
+  approval: z.string().optional(), action: z.string().optional(), needs: z.string().optional(),
+  asked_by: z.string().optional(), auth_url: z.string().optional(), provider: z.string().optional(),
+  checks: z.array(z.object({
+    rule: z.string(), field: z.string(), relation: z.string(), bound: z.string(), ok: z.boolean(),
+  })).default([]),
 });
 const proposalFileSchema = z.object({
   path: z.string(), size: z.number(), binary: z.boolean(), text: z.string().optional(), deleted: z.boolean().optional(),
@@ -33,7 +42,11 @@ type Person = z.infer<typeof personSchema>;
 const PERSON_COLORS = ['#7c4dbd', '#2f7f74', '#b26a2b', '#3a6fc4', '#a8455f'];
 const time = (seconds: number) => new Date(seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
 const initials = (name: string) => name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
-const PROGRESS = /^(plan: |\S+ took |\S+ finished |the agents finished |✓ |✗ )/;
+const PROGRESS = new RegExp('^(plan: |\\S+ (took|finished|resumed|could not finish|kept working on|handed back|'
+  + 'is blocked on|is waiting for a person on) |the agents finished |✓ |✗ )');
+// The room settling a card: "Carol Reyes approved: …", "Erin Walsh connected Claims Hub; the work goes on."
+const SETTLED = /^.+? (approved|declined): |^.+ connected .+; the work goes on\.$/;
+const FINISHED = /^the agents finished \((\w+)\)\s*(.*)$/;
 
 // The Markdown document renderer is only loaded once someone opens a document.
 const LazyDocument = lazy(() => import('./Document').then(module => ({ default: module.Document })));
@@ -164,14 +177,18 @@ export function RoomApp({ workspaceName }: { workspaceName: string }) {
   const person = (id: string) => people.find(p => p.id === id);
   const self = person(me);
 
+  const posts = view?.posts;
+  const viewer = view?.me;
   const threads = useMemo(() => {
     const roots = new Map<string, Post[]>();
-    for (const post of view?.posts ?? []) roots.set(post.thread, [...(roots.get(post.thread) ?? []), post]);
+    // Until the newly signed-in person's view arrives, never show what was private to the last one.
+    const mine = viewer === me ? (posts ?? []) : (posts ?? []).filter(post => !post.to || post.to === me);
+    for (const post of mine) roots.set(post.thread, [...(roots.get(post.thread) ?? []), post]);
     return [...roots.entries()]
       .map(([id, posts]) => ({ id, posts, first: posts[0], last: posts[posts.length - 1] }))
       .filter(item => item.first.kind === 'message')
       .sort((a, b) => b.last.at - a.last.at);
-  }, [view?.posts]);
+  }, [posts, viewer, me]);
   const current = threads.find(item => item.id === thread);
 
   useEffect(() => {
@@ -219,6 +236,24 @@ export function RoomApp({ workspaceName }: { workspaceName: string }) {
           <strong>{author?.name ?? post.author}</strong><time>{time(post.at)}</time></div>
         <div className="result-text room-message"><Markdown text={post.text} /></div>
       </div>;
+    }
+    const finished = post.kind === 'say' && post.detail ? FINISHED.exec(post.text) : null;
+    if (finished) {
+      const done = finished[1] === 'completed';
+      return <div className="room-post" key={post.id}>
+        <div className="message-meta"><DeskAvatar small /><strong>{workspaceName}</strong><time>{time(post.at)}</time>
+          {mine && <span className="room-private"><Lock size={12} />Only you</span>}</div>
+        <div className={`room-result ${done ? 'done' : 'failed'}`}>
+          <div className="room-result-head">{done ? <CircleCheck size={16} /> : <CircleX size={16} />}
+            <strong>{done ? 'Done' : 'Not done'}</strong><small>{finished[2].replace(/^→ /, '')}</small></div>
+          <div className="result-text"><Markdown text={post.detail ?? ''} /></div>
+        </div>
+      </div>;
+    }
+    if (post.kind === 'say' && SETTLED.test(post.text) && !post.to) {
+      const declined = / declined: /.test(post.text);
+      return <div className={`room-progress ${declined ? 'rejected' : 'accepted'}`} key={post.id}>
+        {declined ? <X size={13} /> : <Check size={13} />}<span>{post.text}</span></div>;
     }
     if (post.kind === 'say' && PROGRESS.test(post.text) && !post.to) {
       const decided = post.text.startsWith('✓') ? 'accepted' : post.text.startsWith('✗') ? 'rejected' : '';
@@ -271,6 +306,56 @@ export function RoomApp({ workspaceName }: { workspaceName: string }) {
                   <button className="room-button" onClick={() => void press('show_change', post.proposal!, post.thread)}>Full change</button></>}
           </div>}
         </div>
+      </div>;
+    }
+    if (post.kind === 'approval') {
+      const settled = post.resolved;
+      return <div className="room-post" key={post.id}>
+        <div className="message-meta"><DeskAvatar small /><strong>{workspaceName}</strong><time>{time(post.at)}</time></div>
+        <div className={`room-approval ${settled ? `resolved ${settled}` : ''}`}>
+          <div className="room-approval-head"><ShieldCheck size={17} />
+            <span><strong>Needs sign-off</strong>{post.asked_by && <small>Asked by {post.asked_by}</small>}</span></div>
+          <p className="room-approval-title">{post.text}</p>
+          {post.action && <pre className="room-approval-call">{post.action}</pre>}
+          {post.checks.length > 0 && <ul className="room-checks">{post.checks.map((check, index) =>
+            <li key={index} className={check.ok ? 'ok' : 'failed'}>
+              {check.ok ? <CircleCheck size={14} /> : <CircleX size={14} />}
+              <span><code>{check.field}</code> {check.relation === 'equals' ? 'matches' : check.relation} <code>{check.bound}</code></span>
+              <small>{check.rule}</small>
+            </li>)}</ul>}
+          {post.needs && <p className="room-approval-needs"><KeyRound size={13} />{post.needs}</p>}
+          {settled
+            ? <p className={`room-resolved ${settled}`}>{settled === 'approved' ? <Check size={14} /> : <X size={14} />}
+                {settled === 'approved' ? 'Approved' : 'Declined'} by {post.resolved_by}</p>
+            : <div className="room-actions">
+              <button className="room-button primary" onClick={() => void press('approve', post.approval!, post.thread)}>Approve</button>
+              <button className="room-button" onClick={() => void press('decline', post.approval!, post.thread)}>Decline</button>
+            </div>}
+        </div>
+      </div>;
+    }
+    if (post.kind === 'connect') {
+      return <div className="room-post" key={post.id}>
+        <div className="message-meta"><DeskAvatar small /><strong>{workspaceName}</strong><time>{time(post.at)}</time>
+          <span className="room-private"><Lock size={12} />Only you</span></div>
+        <div className={`room-connect ${post.resolved ? 'resolved' : ''}`}>
+          <div className="room-connect-body"><span className="room-connect-icon"><Plug size={17} /></span>
+            <span><strong>{post.text}</strong><small>{post.detail}</small></span></div>
+          {post.resolved
+            ? <p className="room-resolved"><Check size={14} />{post.provider} connected</p>
+            : post.auth_url && <div className="room-actions">
+              <button className="room-button primary"
+                onClick={() => window.open(post.auth_url, 'jarviscore-connect', 'width=520,height=720')}>
+                Connect {post.provider}<ExternalLink size={13} /></button>
+            </div>}
+        </div>
+      </div>;
+    }
+    if (post.kind === 'notice') {
+      return <div className="room-post" key={post.id}>
+        <div className="message-meta"><DeskAvatar small /><strong>{workspaceName}</strong><time>{time(post.at)}</time>
+          <span className="room-private"><Lock size={12} />Only you</span></div>
+        <div className="room-refusal"><ShieldX size={16} /><span>{post.text}</span></div>
       </div>;
     }
     if (post.kind === 'confirm') {
@@ -341,7 +426,7 @@ export function RoomApp({ workspaceName }: { workspaceName: string }) {
           {current ? current.posts.map(renderPost)
             : <div className="room-empty">
               <h1>What should the team's agents do?</h1>
-              <p>Ask in your own words. The agents propose the change here, your teammates review it, and nothing changes until someone confirms.</p>
+              <p>Ask in your own words. The agents work on it in a thread here: changes to the room's files come back for your team to review, and anything that needs sign-off waits for someone who may give it.</p>
             </div>}
         </div>
       </div>

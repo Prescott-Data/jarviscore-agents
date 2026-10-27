@@ -1,0 +1,1 @@
+"In Claims Hub, locate claim CLM-1041 by its claim identifier, inspect the current claim record, and return provider-readback evidence showing the claim's current status and claim amount, including the currency if available. If no matching claim exists, report that verified no-match result with the search scope and identifier used."

@@ -1,0 +1,1 @@
+{"atom_tools":["claims_hub_approve_claim","claims_hub_get_claim","claims_hub_list_claims","claims_hub_get_claimant","claims_hub_pay_claim"],"out_of_reach":{"claims_hub_approve_claim":["claims.approve","claims_hub_approve_claim(claim_id: str, amount: str) — Approve one vetted insurance claim in Claims Hub for its full amount, as a decimal"]}}

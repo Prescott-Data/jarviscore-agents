@@ -1,0 +1,19 @@
+{
+  "for": "acme/",
+  "runs": [
+    "room-acme--claims-desk-conversation/step_1793080560_d2ea6011",
+    "room-claims-desk-656cb0fed7/step-1",
+    "room-claims-desk-656cb0fed7",
+    "room-acme--claims-desk-conversation/step_1793080601_4755730e",
+    "room-claims-desk-83aa93e1d4/read-clm-1044-notes",
+    "room-claims-desk-83aa93e1d4",
+    "room-claims-desk-83aa93e1d4/pay-clm-1044-new-account"
+  ],
+  "left_out_shared": [],
+  "head_log": {
+    "entries": 154,
+    "last_hash": "4a0f8884d501904b59d9bef89eb08fe28452f05f8391610deb430196d6339b36"
+  },
+  "content": 94,
+  "exported_at": "2026-10-27T10:51:21+00:00"
+}

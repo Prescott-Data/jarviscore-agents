@@ -18,6 +18,9 @@ from pathlib import Path
 from .store import desk_home
 
 MAX_POSTS = 2000
+#: How the room says a card was settled: "<name> approved: …", "<name> connected …; the work goes on."
+DECIDED = re.compile(r"^(?P<by>.+?) (?P<decision>approved|declined): ")
+CONNECTED = re.compile(r"^(?P<by>.+?) connected (?P<provider>.+); the work goes on\.$")
 #: A proposal id names its cache folder; it can never look like a version folder.
 PROPOSAL_ID = re.compile(r"^(?!v\d+$)[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")
 
@@ -100,6 +103,7 @@ class RoomHost:
             elif kind == "room":
                 self.state = data
             elif kind == "post":
+                self._settle(data)
                 self._add(data)
             elif kind == "error":
                 self.errors = (self.errors + [{"at": time.time(), **data}])[-20:]
@@ -132,6 +136,23 @@ class RoomHost:
         temporary.write_text("".join(json.dumps(p, ensure_ascii=False) + "\n" for p in self.posts),
                              encoding="utf-8")
         os.replace(temporary, self.posts_file)
+
+    def _settle(self, post):
+        """Mark the approval or connection card a post settles, so everyone sees it decided."""
+        text = str(post.get("text") or "")
+        decided, connected = DECIDED.match(text), CONNECTED.match(text)
+        if post.get("kind") != "say" or not (decided or connected):
+            return
+        kind = "approval" if decided else "connect"
+        changed = False
+        for earlier in self.posts:
+            if earlier.get("kind") == kind and earlier.get("thread") == post.get("thread") \
+                    and not earlier.get("resolved"):
+                earlier["resolved"] = decided.group("decision") if decided else "connected"
+                earlier["resolved_by"] = (decided or connected).group("by")
+                changed = True
+        if changed:
+            self._save_posts()
 
     def _add(self, post):
         if len(self.posts) >= MAX_POSTS:

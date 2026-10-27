@@ -44,6 +44,16 @@ def content_disposition(kind, path):
     return f"{kind}; filename=\"{fallback}\"; filename*=UTF-8''{quote(name, safe='')}"
 
 
+_CONNECTED = """<!doctype html><html><head><meta charset="utf-8"><title>Connected</title>
+<style>body{margin:0;display:grid;place-items:center;height:100vh;font:15px/1.5 Inter,-apple-system,
+BlinkMacSystemFont,sans-serif;color:#1d2433;background:#f6f8fb}div{text-align:center}
+b{display:block;font-size:20px;margin:10px 0 4px}small{color:#64748b}
+i{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;font-style:normal;
+font-size:22px;color:#fff;background:#2f7f74}.failed i{background:#b42318}</style></head>
+<body class="__STATE__"><div><i>__ICON__</i><b>__MESSAGE__</b>
+<small>You can close this window; the work goes on.</small></div>
+<script>setTimeout(function(){window.close()},1600)</script></body></html>"""
+
 _NOT_BUILT = """<!doctype html><meta charset="utf-8"><title>Desk not built</title>
 <body style="font:16px/1.5 system-ui;max-width:640px;margin:64px auto;padding:0 24px">
 <h1>The Desk's browser app is not built yet</h1>
@@ -412,6 +422,17 @@ def create_app(*, registry=None, home=None, static_dir=None, load_entry_points=F
         return StreamingResponse(stream(), media_type="text/event-stream", headers={
             "X-Accel-Buffering": "no", "Cache-Control": "no-cache, no-transform",
         })
+
+    @app.get("/connected", response_class=HTMLResponse)
+    async def connected(status: str = "", provider: str = ""):
+        # Where someone lands after connecting an account in its provider's consent page.
+        ok = status in ("", "success")
+        name = re.sub(r"[^A-Za-z0-9 _-]", "", provider.replace("-", " ").replace("_", " ")).title()
+        message = (f"{name or 'Your account'} is connected." if ok
+                   else "The connection was not completed.")
+        return HTMLResponse(_CONNECTED.replace("__MESSAGE__", message)
+                            .replace("__STATE__", "ok" if ok else "failed")
+                            .replace("__ICON__", "✓" if ok else "✕"))
 
     @app.get("/{asset_path:path}")
     async def asset(asset_path: str):

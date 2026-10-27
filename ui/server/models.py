@@ -261,6 +261,8 @@ class RoomMessage(BaseModel):
 class RoomPress(BaseModel):
     model_config = ConfigDict(extra="forbid")
     person: str = Field(min_length=1, max_length=64)
-    action: Literal["accept", "show_change", "release", "discard", "confirm", "cancel"]
-    target: str = Field(min_length=1, max_length=128)
+    action: Literal["accept", "show_change", "release", "discard", "confirm", "cancel",
+                    "approve", "decline"]
+    # An approval's target names its work and the action's fingerprint.
+    target: str = Field(min_length=1, max_length=256)
     thread: str | None = Field(default=None, max_length=128)

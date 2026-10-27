@@ -64,7 +64,39 @@ def make_surface():
             return self._post(thread, "confirm", to=to, text=decision.get("summary", ""),
                               decision=decision.get("id", ""))
 
-    return DeskSurface()
+        async def show_approval(self, thread, question, *, to=None):
+            return self._post(thread, "approval", to=to, text=question.get("title", ""),
+                              approval=question.get("id", ""), action=question.get("action", ""),
+                              needs=question.get("needs", ""), asked_by=question.get("asked_by", ""),
+                              checks=checks_shown(question.get("checks")))
+
+        async def show_connect(self, thread, request, *, to):
+            return self._post(thread, "connect", to=to, text=request.get("title", ""),
+                              detail=request.get("detail", ""), auth_url=request.get("auth_url", ""),
+                              provider=request.get("name") or request.get("provider", ""))
+
+    surface = DeskSurface()
+    # After consenting, people land on the Desk's own page, which closes itself.
+    surface.connect_return_url = f"{os.environ.get('DESK_URL', 'http://127.0.0.1:8765')}/connected"
+    return surface
+
+
+def checks_shown(checks):
+    """What an approver is shown of the checks run before they were asked: each rule a
+    value had to meet, and whether it did. Never the values themselves (they are digests)."""
+    shown = []
+    for check in checks or ():
+        grounding = (check or {}).get("grounding") or {}
+        for item in grounding.get("checks") or ():
+            bound = item.get("equals") or item.get("at_most") or item.get("one_of") or ""
+            shown.append({
+                "rule": item.get("rule") or "",
+                "field": str(item.get("field") or "").rsplit(".", 1)[-1],
+                "relation": "equals" if item.get("equals") else "at most" if item.get("at_most") else "one of",
+                "bound": str(bound),
+                "ok": bool(item.get("ok")),
+            })
+    return shown
 
 
 #: The new text of a proposal's file is sent along (for a formatted preview) up to this size.

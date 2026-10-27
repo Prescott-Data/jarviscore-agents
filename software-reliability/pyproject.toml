@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
-    "jarviscore-framework[redis]>=2.3.1,<2.4",
+    "jarviscore-framework[redis]>=3.0.1,<4",
     "pydantic>=2",
 ]
 

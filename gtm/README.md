@@ -1,6 +1,6 @@
 # JarvisCore for GTM
 
-A go-to-market desk built on [`jarviscore-framework`](https://pypi.org/project/jarviscore-framework/) 2.3.
+A go-to-market desk built on [`jarviscore-framework`](https://pypi.org/project/jarviscore-framework/) 3.0.
 Two plain `AutoAgent`s, no framework workarounds.
 
 | Agent | Job | Credentials |

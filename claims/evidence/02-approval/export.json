@@ -1,0 +1,17 @@
+{
+  "for": "acme/",
+  "runs": [
+    "room-acme--claims-desk-conversation/step_1793066749_00d8fade",
+    "room-claims-desk-c66c9722dc/step-1",
+    "room-claims-desk-c66c9722dc",
+    "room-acme--claims-desk-conversation/step_1793066817_1f589ce1",
+    "room-claims-desk-6f5da3f41b/step-1"
+  ],
+  "left_out_shared": [],
+  "head_log": {
+    "entries": 3797,
+    "last_hash": "224a6238833a0b231813bfec742e9c5bc4da7977a480c17515f1e1851a319c1f"
+  },
+  "content": 73,
+  "exported_at": "2026-10-27T10:51:21+00:00"
+}
